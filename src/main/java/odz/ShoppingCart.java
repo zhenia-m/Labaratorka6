@@ -7,40 +7,31 @@ import java.text.*;
 public class ShoppingCart {
     public static enum ItemType {NEW, REGULAR, SECOND_FREE, SALE};
     /**
+     * Container for added items
+     */
+    private List<Item> items = new ArrayList<Item>();
+    /**
      * Tests all class methods.
      */
     public static void main(String[] args) {
 // TODO: add tests here
         ShoppingCart cart = new ShoppingCart();
-        cart.addItem("Apple", 0.99, 5, ItemType.NEW);
-        cart.addItem("Banana", 20.00, 4, ItemType.SECOND_FREE);
-        cart.addItem("A long piece of toilet paper", 17.20, 1, ItemType.SALE);
-        cart.addItem("Nails", 2.00, 500, ItemType.REGULAR);
+        cart.addItem(new ItemNew("Apple", 0.99, 5));
+        cart.addItem(new ItemSecondFree("Banana", 20.00, 4));
+        cart.addItem(new ItemSale("A long piece of toilet paper", 17.20, 1));
+        cart.addItem(new ItemRegular("Nails", 2.00, 500));
         System.out.println(cart.formatTicket());
     }
 
-    /**
-     * Adds new item.
-     *
-     * @param title    item title 1 to 32 symbols
-     * @param price    item ptice in USD, > 0
-     * @param quantity item quantity, from 1
-     * @param type     item type
-     * @throws IllegalArgumentException if some value is wrong
-     */
-    public void addItem(String title, double price, int quantity, ItemType type) {
-        if (title == null || title.length() == 0 || title.length() > 32)
+    public void addItem(Item item) {
+        if (item.getTitle() == null || item.getTitle().length() == 0 || item.getTitle().length() > 32)
             throw new IllegalArgumentException("Illegal title");
-        if (price < 0.01)
+        if (item.getPrice() < 0.01)
             throw new IllegalArgumentException("Illegal price");
-        if (quantity <= 0)
+        if (item.getQuantity() <= 0)
             throw new IllegalArgumentException("Illegal quantity");
-        Item item = new Item();
-        item.setQuantity(quantity);
-        item.setType(type);
-        item.setTitle(title);
-        item.setPrice(price);
-        items.add(item);
+
+        this.items.add(item);
     }
 
     private void appendSeparator(int lineLength, StringBuilder sb) {
@@ -82,23 +73,10 @@ public class ShoppingCart {
         return getFormattedTicketTable(total);
     }
 
-    private double calculateItemsParameters(){
-        double total = 0.00;
-        for (Item item : items) {
-            item.setDiscount(calculateDiscount(item.getType(), item.getQuantity()));
-            item.setTotalPrice(item.getPrice() * item.getQuantity() * (100.00 - item.getDiscount()) / 100.00);
-            total += item.getTotalPrice();
-        }
-        return total;
-    }
-
-    private String getFormattedTicketTable(double total) {
-        if (items.size() == 0)
-            return "No items.";
-        List<String[]> lines = new ArrayList<String[]>();
-        String[] header = {"#", "Item", "Price", "Quan.", "Discount", "Total"};
-        int[] align = new int[]{1, -1, 1, 1, 1, 1};
+    private List<java.lang.String[]> convertItemsToTableLines() {
         // formatting each line
+        List<String[]> lines = new ArrayList<String[]>();
+        double total = 0.00;
         int index = 0;
         for (Item item : items) {
             lines.add(new String[]{
@@ -110,6 +88,28 @@ public class ShoppingCart {
                     MONEY.format(item.getTotalPrice())
             });
         }
+        return lines;
+    }
+
+    private double calculateItemsParameters(){
+        double total = 0.00;
+        for (Item item : items) {
+            item.setDiscount(item.calculateDiscount());
+            item.setTotalPrice(item.calculateTotalPrice());
+            total += item.getTotalPrice();
+        }
+        return total;
+    }
+
+    private String getFormattedTicketTable(double total) {
+        if (items.size() == 0)
+            return "No items.";
+
+        String[] header = {"#", "Item", "Price", "Quan.", "Discount", "Total"};
+        int[] align = new int[]{1, -1, 1, 1, 1, 1};
+        // formatting each line
+        int index = items.size();
+        List<String[]> lines = convertItemsToTableLines();
         String[] footer = {String.valueOf(index), "", "", "", "",
                 MONEY.format(total)};
         // formatting table
@@ -205,72 +205,4 @@ public class ShoppingCart {
         return discount;
     }
 
-    /**
-     * item info
-     */
-    /**
-     * item info
-     */
-    private static class Item {
-        private String title;
-        private double price;
-        private int quantity;
-        private ItemType type;
-        private int discount;
-        private double total;
-
-        public ItemType getType() {
-            return type;
-        }
-
-        public void setType(ItemType type) {
-            this.type = type;
-        }
-
-        public int getDiscount() {
-            return discount;
-        }
-
-        public void setDiscount(int discount) {
-            this.discount = discount;
-        }
-
-        public double getTotalPrice() {
-            return total;
-        }
-
-        public void setTotalPrice(double total) {
-            this.total = total;
-        }
-        public String getTitle() {
-            return title;
-        }
-
-        public void setTitle(String title) {
-            this.title = title;
-        }
-
-        public double getPrice() {
-            return price;
-        }
-
-        public void setPrice(double price) {
-            this.price = price;
-        }
-
-        public int getQuantity() {
-            return quantity;
-        }
-
-        public void setQuantity(int quantity) {
-            this.quantity = quantity;
-        }
-
-
-    }
-
-    /**
-     * Container for added items
-     */
-    private List<Item> items = new ArrayList<Item>();
 }

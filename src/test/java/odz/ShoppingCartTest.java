@@ -9,10 +9,10 @@ class ShoppingCartTest {
     @BeforeEach
     void setUp() {
         cart = new ShoppingCart();
-        cart.addItem("Apple", 0.99, 5, ShoppingCart.ItemType.NEW);
-        cart.addItem("Banana", 20.00, 4, ShoppingCart.ItemType.SECOND_FREE);
-        cart.addItem("A long piece of toilet paper", 17.20, 1, ShoppingCart.ItemType.SALE);
-        cart.addItem("Nails", 2.00, 500, ShoppingCart.ItemType.REGULAR);
+        cart.addItem(new ItemNew("Apple", 0.99, 5));
+        cart.addItem(new ItemSecondFree("Banana", 20.00, 4));
+        cart.addItem(new ItemSale("A long piece of toilet paper", 17.20, 1));
+        cart.addItem(new ItemRegular("Nails", 2.00, 500));
     }
 
     @Test
@@ -50,19 +50,19 @@ class ShoppingCartTest {
 
     @Test
     public void testCalculateDiscount() {
-        assertEquals(80, ShoppingCart.calculateDiscount(ShoppingCart.ItemType.SALE, 500));
-        assertEquals(73, ShoppingCart.calculateDiscount(ShoppingCart.ItemType.SALE, 30));
-        assertEquals(71, ShoppingCart.calculateDiscount(ShoppingCart.ItemType.SALE, 10));
-        assertEquals(70, ShoppingCart.calculateDiscount(ShoppingCart.ItemType.SALE, 9));
-        assertEquals(70, ShoppingCart.calculateDiscount(ShoppingCart.ItemType.SALE, 1));
-        assertEquals(0,  ShoppingCart.calculateDiscount(ShoppingCart.ItemType.NEW, 20));
-        assertEquals(0,  ShoppingCart.calculateDiscount(ShoppingCart.ItemType.NEW, 10));
-        assertEquals(0,  ShoppingCart.calculateDiscount(ShoppingCart.ItemType.NEW, 1));
-        assertEquals(80, ShoppingCart.calculateDiscount(ShoppingCart.ItemType.SECOND_FREE, 500));
-        assertEquals(53, ShoppingCart.calculateDiscount(ShoppingCart.ItemType.SECOND_FREE, 30));
-        assertEquals(51, ShoppingCart.calculateDiscount(ShoppingCart.ItemType.SECOND_FREE, 10));
-        assertEquals(50, ShoppingCart.calculateDiscount(ShoppingCart.ItemType.SECOND_FREE, 9));
-        assertEquals(50, ShoppingCart.calculateDiscount(ShoppingCart.ItemType.SECOND_FREE, 2));
-        assertEquals(0,  ShoppingCart.calculateDiscount(ShoppingCart.ItemType.SECOND_FREE, 1));
+        assertEquals(80, new ItemSale("Test",0.00,500).calculateDiscount());
+        assertEquals(73, new ItemSale("Test",0.00,30).calculateDiscount());
+        assertEquals(71, new ItemSale("Test",0.00,10).calculateDiscount());
+        assertEquals(70, new ItemSale("Test",0.00,9).calculateDiscount());
+        assertEquals(70, new ItemSale("Test",0.00,1).calculateDiscount());
+        assertEquals(0,  new ItemNew("Test",0.00,20).calculateDiscount());
+        assertEquals(0,  new ItemNew("Test",0.00,10).calculateDiscount());
+        assertEquals(0,  new ItemNew("Test",0.00,1).calculateDiscount());
+        assertEquals(80, new ItemSecondFree("Test",0.00,500).calculateDiscount());
+        assertEquals(53, new ItemSecondFree("Test",0.00,30).calculateDiscount());
+        assertEquals(51, new ItemSecondFree("Test",0.00,10).calculateDiscount());
+        assertEquals(50, new ItemSecondFree("Test",0.00,9).calculateDiscount());
+        assertEquals(50, new ItemSecondFree("Test",0.00,2).calculateDiscount());
+        assertEquals(0,  new ItemSecondFree("Test",0.00,1).calculateDiscount());;
     }
 }
